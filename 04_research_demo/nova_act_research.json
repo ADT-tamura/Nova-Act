@@ -1,0 +1,18 @@
+{
+  "research_date": "2026-02-18T19:14:41.769362",
+  "nova_act_info": {
+    "overview": "Amazon Nova Actに関する情報を公式ページから収集しました",
+    "features": [
+      "ブラウザ操作の自動化",
+      "自然言語による指示",
+      "複雑なワークフローの実行"
+    ],
+    "use_cases": [
+      "Webスクレイピング",
+      "テスト自動化",
+      "データ収集"
+    ],
+    "additional_info": "収集日時: 2026-02-18T19:20:19.707984, URL: https://aws.amazon.com/jp/nova/act/"
+  },
+  "case_studies": []
+}
