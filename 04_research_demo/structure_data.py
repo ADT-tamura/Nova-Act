@@ -33,23 +33,18 @@ JSON形式のみを出力してください。説明は不要です。"""
     print("\n🤖 Amazon BedrockのNova Proで構造化しています...")
     
     # Bedrock APIリクエスト（Nova用）
-    request_body = {
-        "messages": [
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        "inferenceConfig": {
-            "max_new_tokens": 1024,
-            "temperature": 0.7
-        }
-    }
-    
     response = bedrock_runtime.converse(
         modelId="us.amazon.nova-pro-v1:0",
-        messages=request_body["messages"],
-        inferenceConfig=request_body["inferenceConfig"]
+        messages=[
+            {
+                "role": "user",
+                "content": [{"text": prompt}]
+            }
+        ],
+        inferenceConfig={
+            "maxTokens": 1024,
+            "temperature": 0.7
+        }
     )
     
     # レスポンスを解析

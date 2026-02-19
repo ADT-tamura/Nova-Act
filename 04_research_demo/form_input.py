@@ -53,44 +53,48 @@ def input_to_form():
     
     with BrowserOrchestrator() as orchestrator:
         
-        with orchestrator.create_session("ブラウザB", "https://forms.gle/RA4yez3AsU5LxbtQ6") as browser_b:
+        with orchestrator.create_session("ブラウザB", "https://forms.gle/bkfqLXki7hoHX1iT7") as browser_b:
             
             browser_b.execute("このページ全体をゆっくりスクロールして、すべての質問項目を確認してください。")
             
-            if not wait_for_key():
-                print("\n⛔ フォーム入力をスキップしました")
-                return
-            
             nova_info = research_data.nova_act_info
             
-            # 1つ目: 機能
+            # 特徴を入力
             if nova_info.features:
                 features_text = ", ".join(nova_info.features)
-                print(f"\n📝 機能を入力: {features_text}")
-                browser_b.execute("ページの一番上にある最初のテキスト入力欄をクリックしてください。")
-                browser_b.execute(f"クリックした入力欄に次のテキストを入力してください: {features_text}")
+                print(f"\n📝 特徴を入力: {features_text}")
                 
-                if not wait_for_key():
-                    return
-            
-            # 2つ目: ユースケース
-            if nova_info.use_cases:
-                use_cases_text = ", ".join(nova_info.use_cases)
-                print(f"\n📝 ユースケースを入力: {use_cases_text}")
-                browser_b.execute("ページを下にスクロールして、1つ目の入力欄の下にある次のテキスト入力欄を画面に表示してください。")
-                browser_b.execute("今画面に表示されている、1つ目とは異なる2番目のテキスト入力欄をクリックしてください。")
-                browser_b.execute(f"今クリックした2番目の入力欄に次のテキストを入力してください: {use_cases_text}")
+                # まずクリック
+                browser_b.execute(
+                    "「NovaActの特徴」という質問の下にある「回答を入力」と書かれた入力欄をクリックしてください。"
+                )
                 
-                if not wait_for_key():
-                    return
+                # 次に入力
+                browser_b.execute(
+                    f"フォーカスされている入力欄に次のテキストを入力してください: {features_text}"
+                )
+                
+                print(f"✅ 入力完了")
             
-            print("\n✅ 入力完了")
-            browser_b.execute("ページの下部にある送信ボタンを探して表示してください。")
+            print("\n✅ 入力が完了しました")
+            
+            # 送信ボタンを表示
+            browser_b.execute(
+                "ページの下部にスクロールして、「送信」ボタンを画面に表示してください。"
+            )
             
             if not wait_for_key():
+                print("\n⛔ 送信をスキップしました")
                 return
+            
+            # 送信ボタンをクリック
+            browser_b.execute(
+                "「送信」ボタンをクリックしてください。"
+            )
+            
+            print("\n✅ フォームを送信しました！")
     
-    print("\n✅ フォーム入力が完了しました！")
+    print("\n✅ フォーム入力処理が完了しました！")
 
 
 if __name__ == "__main__":
