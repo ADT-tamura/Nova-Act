@@ -67,6 +67,11 @@ IAM validation failed: Token has expired and refresh failed
 ```python
 boto_session_kwargs={"region_name": "us-east-1", "profile_name": "your-profile-name"}
 ```
+
+### kiro
+
+kiroを開く際のコマンド
+
 ```
 /mnt/c/Users/tamura.hiromi/AppData/Local/Programs/Kiro/bin/kiro .
 ```
