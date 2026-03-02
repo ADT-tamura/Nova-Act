@@ -1,44 +1,100 @@
 """メインオーケストレーター - 全処理を自動実行"""
 import os
 import sys
+import termios
+import tty
+
+from browser_manager import BrowserOrchestrator
 
 # AWSリージョンを設定
 os.environ["AWS_REGION"] = "us-east-1"
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
+def wait_for_key() -> bool:
+    """Enterキーで継続(True)、Escキーで停止(False)を返す"""
+    print("\n待機中... Enterキーで継続、Escキーで停止...")
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+
+    try:
+        tty.setraw(fd)
+        key = sys.stdin.read(1)
+        
+        if key in ['\r', '\n']:
+            print("→ 継続します")
+            return True
+        elif key == '\x1b':
+            print("→ 停止しました")
+            return False
+        else:
+            print(f"→ 無効なキーです。Enterキーで継続、Escキーで停止してください")
+            return wait_for_key()
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
 def main():
     """全処理を順番に実行"""
 
     print("="*60)
-    print("Amazon Nova Act - AWSコンソール操作デモ")
+    print("Amazon Nova Act - ヌーラボ操作デモ")
     print("="*60)
 
-    # ステップ1: NovaActでAWSコンソールを開く
-    print("\n" + "="*60)
-    print("ステップ1: NovaActでヌーラボアカウントログイン画面を開く")
-    print("="*60)
+    with BrowserOrchestrator() as orchestrator:
 
-    try:
-        from nulab_login import open_nulab_login
-        result = open_nulab_login()
+        # ステップ1: ヌーラボログイン
+        print("\n" + "="*60)
+        print("ステップ1: ヌーラボログイン")
+        print("="*60)
 
-        if not result:
-            print("\n✗ ヌーラボアカウントログイン画面を開くのに失敗しました")
-            return
+        nulab_login_url = "https://apps.nulab.com/signin"
+        
+        with orchestrator.create_session("ヌーラボログイン", nulab_login_url) as browser:
+
+            print("\n→ ログイン画面を開いています...")
+            browser.execute("ページが完全に読み込まれるまで待ってください。")
+
+            print("\n→ Emailを入力しています...")
+            browser.execute("Emailの入力フォームに'advance.sbn.saas.test@gmail.com'を入力してください。")
+
+            print("\n→ Nextボタンを押しています...")
+            browser.execute("Nextボタンをクリックしてください。")
+
+            print("\n→ パスワードを入力しています...")
+            browser.execute("パスワードの入力フォームに'sjduvnfu'を入力してください。")
+
+            print("\n→ ログインボタンを押しています...")
+            browser.execute("ログインボタンをクリックしてください。")
+            print("  - ログイン完了")
 
         print("\n✓ ステップ1完了")
 
-    except Exception as e:
-        print(f"\n✗ ステップ1でエラーが発生しました:\n{e}")
-        import traceback
-        traceback.print_exc()
-        return
+        # ステップ2: プロジェクト選択
+        print("\n" + "="*60)
+        print("ステップ2: プロジェクト選択")
+        print("="*60)
 
-    # 今後のステップ（コメントアウト）
-    # ステップ2: 特定のAWSサービスにアクセス
-    # ステップ3: 情報を収集
-    # など
+        nulab_projects_url = "https://apps.nulab.com/"
+        
+        with orchestrator.create_session("プロジェクト選択", nulab_projects_url) as browser:
+
+            print("\n→ プロジェクト一覧画面を開いています...")
+            browser.execute("ページが完全に読み込まれるまで待ってください。")
+
+            print("\n→ プロジェクト一覧を確認しています...")
+            browser.execute("現在表示されているページにプロジェクト一覧が表示されていることを確認してください。")
+
+            print("\n→ 'NovaActデモプレイ'プロジェクトを選択しています...")
+            browser.execute("プロジェクト一覧から'NovaActデモプレイ'という名前のプロジェクトをクリックしてください。")
+            print("  - プロジェクト選択完了")
+
+            if not wait_for_key():
+                print("\n→ 処理を中断します")
+                return
+
+        print("\n✓ ステップ2完了")
 
     # 完了
     print("\n" + "="*60)
